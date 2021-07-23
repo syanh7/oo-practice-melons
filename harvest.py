@@ -66,12 +66,12 @@ def make_melon_types():
     return all_melon_types
 
 
-def print_pairing_info(melon_types):
+def print_pairing_info(all_melon_types):
     """Prints information about each melon type's pairings."""
 
     #iterate through list of MelonType objects
     #and prints the pairings list off
-    for melon in melon_types:
+    for melon in all_melon_types:
         
         print(f"{melon.name} pairs with")
         
@@ -80,17 +80,17 @@ def print_pairing_info(melon_types):
             print(f"\t- {pairing}")
 
 
-def make_melon_type_lookup(melon_types):
+def make_melon_type_lookup(all_melon_types):
     """Takes a list of MelonTypes and returns a dictionary of melon type by code."""
 
     #takes the list of MelonType object and creates a dict with
     #key as code, value as MelonType object
-    melon_type_dict = {}
-    for melon in melon_types:
-        melon_type_dict[melon.code] = melon
+    melons_by_id = {}
+    for melon in all_melon_types:
+        melons_by_id[melon.code] = melon
 
 
-    return melon_type_dict
+    return melons_by_id
     #{'yw': <__main__.MelonType object at 0x7fb505802700>, 'cas': <__main__.MelonType object at 0x7fb505818550>}
 
     # Fill in the rest
@@ -168,11 +168,49 @@ def get_sellability_report(melons):
     
     
 
+def create_melons_from_text(text_file, all_melon_types):
+    open_file = open(text_file)
+    melons_harvested = []
+    melons_by_id = make_melon_type_lookup(all_melon_types)
 
 
+    for line in open_file:
+        line_list = line.split()
+        #make melon object
+        melon_type = line_list[5]
+        shape_rating = int(line_list[1])
+        color_rating = int(line_list[3])
+        field = int(line_list[-1])
+        harvester = line_list[8]
+
+        melon = Melon(melons_by_id[melon_type],
+                shape_rating,
+                color_rating,
+                field,
+                harvester)
+        
+        melons_harvested.append(melon)
+
+    return melons_harvested
+
+    #{'yw': <__main__.MelonType object at 0x7fb505802700>, 'cas': <__main__.MelonType object at 0x7fb505818550>}
+    #melon = Melon(melons_by_id['yw'], 8, 7, 2, 'Sheila')
+    #yellowwatermelon = MelonType('yw', 2013, 'yellow', False, True, 'yellow watermelon')
+
+    #Shape 4 Color 6 Type musk Harvested By Sheila Field # 52
+    # 0    1   2   3   4   5       6      7     8    9  10 11
 #make the melon type list
-melon_type_list = make_melon_types()
+all_melon_types = make_melon_types()
 #sends the list to get the melons harvested
-melons_harvested = make_melons(melon_type_list)
+melons_harvested = make_melons(all_melon_types)
 #prints if melons are sellable or not
 get_sellability_report(melons_harvested)
+
+melons_harvested = create_melons_from_text('harvest_log.txt', all_melon_types)
+get_sellability_report(melons_harvested)
+
+#Create a function that opens the file harvest_log.txt, 
+#loops over the file and creates a melon object for each line of the file
+
+
+
